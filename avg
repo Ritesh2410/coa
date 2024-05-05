@@ -1,0 +1,67 @@
+data segment
+msg1 db 10,13,"Avg no : $"
+
+no db 10h,10h,10h,10h,10h
+
+data ends
+
+code segment
+assume cs : code, ds : data
+start:
+	mov ax, data
+	mov ds,ax
+	
+	 mov ch,04h 
+	mov si,00h
+mov al,[no+si]
+
+back:
+inc si
+add al,[no+si]
+jnc down9
+mov bl,al
+
+down9:
+dec ch
+jnz back
+
+mov bl,05h
+div bl
+
+mov bh,al
+lea dx,msg1
+	mov ah,09h
+	int 21h
+call display
+
+mov ah,4ch
+int 21h
+
+
+display proc near
+        mov ch, bh
+        and ch, 0f0h
+        mov cl, 04h
+        rol ch, cl
+        cmp ch, 09h
+        jbe down4
+        add ch, 07h
+down4 :
+        add ch, 30h
+        mov dl, ch
+        mov ah, 02h
+        int 21h
+        mov ch, bh
+        and ch, 0fh
+        cmp ch, 09h
+        jbe down5
+        add ch, 07h
+down5 : add ch, 30h
+        mov dl, ch
+        mov ah, 02h
+        int 21h
+        
+        ret
+        display endp
+code ends
+end start
